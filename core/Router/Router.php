@@ -2,6 +2,12 @@
 
 namespace App\Core\Router;
 
+use App\Core\DataBase\DataBase;
+use App\Core\Http\Request;
+use App\Core\Redirect\Redirect;
+use App\Core\View\View;
+use App\Core\Session\Session;
+
 class Router
 {
     private array $routes = [
@@ -9,8 +15,20 @@ class Router
         'POST' => []
     ];
 
-    public function __construct()
+    private View $view;
+    private Request $request;
+    private Redirect $redirect;
+    private Session $session;
+
+    private Database $dataBase;
+    public function __construct(View $view, Request $request, Redirect $redirect, Session $session, Database $db )
     {
+        $this->view = $view;
+        $this->request = $request;
+        $this->redirect = $redirect;
+        $this->session = $session;
+        $this->dataBase = $db;
+
         $this->initRoutes();
 
     }
@@ -30,15 +48,19 @@ class Router
 
         if(is_array($route->getAction())) {
             $temp= $route->getAction();
-            $controller=$temp[0];
-            $action=$temp[1];
+            [$controller, $action] = $temp;
 
             $controller = new $controller();
-            //dd($action);
+            call_user_func_array([$controller, 'setView'], [$this->view]);
+            call_user_func_array([$controller, 'setRequest'], [$this->request]);
+            call_user_func_array([$controller, 'setRedirect'], [$this->redirect]);
+            call_user_func_array([$controller, 'setSession'], [$this->session]);
+            call_user_func_array([$controller, 'setDatabase'], [$this->dataBase]);
+
             call_user_func([$controller,$action]);
         }
         else
-            $route->getAction();
+            call_user_func($route->getAction());
     }
 
     private function initRoutes(): void

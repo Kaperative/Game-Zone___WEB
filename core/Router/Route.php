@@ -8,6 +8,13 @@ class Route
     private string $uri;
     private $action;
 
+    private function __construct(string $method, string $uri, $action)
+    {
+        $this->method = $method;
+        $this->uri = $uri;
+        $this->action = $action;
+    }
+
     public  static function get(string $uri, $action): self
     {
         return new self('GET', $uri, $action);
@@ -16,13 +23,6 @@ class Route
     public static function post(string $uri,  $action): self
     {
         return new self('POST', $uri, $action);
-    }
-
-    private function __construct(string $method, string $uri, $action)
-    {
-        $this->method = $method;
-        $this->uri = $uri;
-        $this->action = $action;
     }
 
     public function getMethod(): string

@@ -1,23 +1,57 @@
 
-<?php include_once APP_PATH."/views/includes/header.php" ?>
+<?php
+/**
+ * @var App\Core\View\View $view
+ * @var Session $session
+ */
+
+use App\Core\Session\Session;
+
+?>
+
+<?php  $view->includeComponent("header"); ?>
+
+
+
+
+
 <main class="register-page">
     <div class="register-container">
         <div class="register-box">
             <h1>Создать аккаунт</h1>
             <p>Присоединяйтесь к миллионам игроков по всему миру</p>
-            
-            <form id="register-form" class="auth-form" method="POST" action=<?=APP_PATH."/controller/reg.php"?>>
+
+            <form id="register-form"
+                  class="auth-form"
+                  method="POST"
+                  action="/register"
+            >
                 <div class="form-group">
+                    <?php if ($session->has('username')) { ?>
+                        <div id="name" class="invalid-feedback">
+                            <li style="color: #d94126 "> <?php echo $session->getFlush('username') ?></li>
+                        </div>
+                    <?php } ?>
                     <label for="username">Имя пользователя</label>
                     <input type="text" id="username" name="username" required>
                 </div>
                 
                 <div class="form-group">
+                    <?php if ($session->has('email')) { ?>
+                        <div id="name" class="invalid-feedback">
+                            <li style="color: #d94126 "> <?php echo $session->getFlush('email') ?></li>
+                        </div>
+                    <?php } ?>
                     <label for="email">Email адрес</label>
                     <input type="email" id="email" name="email" required>
                 </div>
                 
                 <div class="form-group">
+                    <?php if ($session->has('password')) { ?>
+                        <div id="name" class="invalid-feedback" >
+                            <li style="color: #d94126 "> <?php echo $session->getFlush('password') ?></li>
+                        </div>
+                    <?php } ?>
                     <label for="password">Пароль</label>
                     <input type="password" id="password" name="password" required>
                     <div class="password-strength">
@@ -25,11 +59,6 @@
                         <span class="strength-bar medium"></span>
                         <span class="strength-bar strong"></span>
                     </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="confirm-password">Подтвердите пароль</label>
-                    <input type="password" id="confirm-password" name="confirm-password" required>
                 </div>
                 
                 <button type="submit" class="btn btn-primary btn-block">Продолжить</button>
@@ -45,7 +74,7 @@
             </div>
             
             <div class="login-link">
-                Уже есть аккаунт? <a href="login.html">Войти</a>
+                Уже есть аккаунт? <a href="/auth">Войти</a>
             </div>
         </div>
         
@@ -61,5 +90,4 @@
         </div>
     </div>
 </main>
-
-<?php include_once APP_PATH."/views/includes/footer.php" ?>
+<?php  $view->includeComponent("footer"); ?>

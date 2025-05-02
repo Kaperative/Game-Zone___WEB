@@ -2,17 +2,17 @@
 
 namespace App\Core;
 
-use App\Core\Http\Request;
-use App\Core\Router\Router;
+use App\Core\Container\Container;
 
 class   App{
 
     public function run():void
     {
-        $router = new Router();
-
-        $request = Request::createFromGlobals();
+        $container =new  Container();
         // dd($request);
-        $router->dispatch($request->getUri(),$request->getMethod() );
+        $container->router->dispatch(
+                $container->request->getUri(),
+                $container->request->getMethod()
+        );
     }
 }

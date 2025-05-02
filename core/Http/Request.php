@@ -2,13 +2,17 @@
 
 namespace App\Core\Http;
 
+use App\Core\Validator\Validator;
+
 class Request
 {
-        private array $get;
-        private array $post;
-        private array $server;
-        private array $files;
-        private array $cookies;
+    private array $get;
+        public array $post;
+        public array $server;
+        public array $files;
+        public array $cookies;
+
+    public Validator $validator;
     public function __construct($_get, $_post, $_server, $_files, $_cookies)
     {
         $this->get=$_get;
@@ -16,6 +20,7 @@ class Request
         $this->server=$_server;
         $this->files=$_files;
         $this->cookies=$_cookies;
+        $this->validator = new Validator();
     }
 
     public static function createFromGlobals(): self
@@ -28,9 +33,30 @@ class Request
        return strtok($_SERVER['REQUEST_URI'],"?");
    }
 
-   public function getMethod():string
+   public static function getMethod():string
    {
      return $_SERVER['REQUEST_METHOD'];
    }
+
+   public function inputAll($name, $default = null): mixed
+   {
+        return $this->post[$name] ?? $this->get[$name] ?? $default;
+   }
+
+   public function inputGET($name, $default = null)
+   {
+       return $this->get[$name] ?? $default;
+   }
+
+   public function inputPOST($name, $default = null)
+   {
+       return $this->post[$name] ?? $default;
+   }
+
+    public function setValidator(Validator $validator): void
+    {
+        $this->validator = $validator;
+    }
+
 
 }

@@ -10,11 +10,6 @@ use App\Core\Session\Session;
 ?>
 
 <?php  $view->includeComponent("header"); ?>
-
-
-
-
-
 <main class="register-page">
     <div class="register-container">
         <div class="register-box">
@@ -24,8 +19,7 @@ use App\Core\Session\Session;
             <form id="register-form"
                   class="auth-form"
                   method="POST"
-                  action="/register"
-            >
+                  action="/register">
                 <div class="form-group">
                     <?php if ($session->has('username')) { ?>
                         <div id="name" class="invalid-feedback">

@@ -3,6 +3,25 @@ recipe: lamp
 config:
   php: 8.2
   webroot: public
-  services:
-    phpmyadmin:
-      type: phpmyadmin
+
+services:
+  appserver:
+    # Автоматическая установка зависимостей
+    composer:
+      install: true
+      post_rebuild:
+        - composer install
+
+    overrides:
+      environment:
+        COMPOSER_MEMORY_LIMIT: -1
+      volumes:
+        - ~/.composer/cache:/root/.composer/cache
+
+  phpmyadmin:
+    type: phpmyadmin
+
+tooling:
+  composer:
+    service: appserver
+    cmd: composer --ignore-platform-reqs

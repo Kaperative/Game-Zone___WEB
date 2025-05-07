@@ -9,7 +9,7 @@ class   App{
     public function run():void
     {
         $container =new  Container();
-        // dd($request);
+
         $container->router->dispatch(
                 $container->request->getUri(),
                 $container->request->getMethod()

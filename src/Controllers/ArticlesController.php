@@ -6,7 +6,7 @@ use App\Core\Controller\Controller;
 use App\Core\DataBase\Model\Article;
 use App\Core\DataBase\Model\User;
 
-class Articles extends Controller
+class ArticlesController extends Controller
 {
     public function index(): void
     {

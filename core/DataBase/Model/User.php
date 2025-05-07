@@ -4,13 +4,16 @@ namespace App\Core\DataBase\Model;
 
 use App\Core\Config\Config;
 use App\Core\DataBase\DataBase;
+use App\Core\JsonWebToken\JsonWebToken;
 
 class User extends DataBase
 {
+    private JsonWebToken $jwt;
     private string $table = "users";
     protected Config $config;
     public function __construct()
     {
+        $this->jwt = new JsonWebToken();
         $config = new Config();
         parent::__construct($config);
     }
@@ -31,14 +34,22 @@ class User extends DataBase
         return $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
     }
 
-    public function findById(int $id): ?array
+    public function findById($id): ?array
     {
+
+        $id = is_object($id) ? ($id->userID ?? null) : $id;
+
+        $id = (int)$id;
+
+        if ($id <= 0) {
+            return null;
+        }
+
         $sql = "SELECT * FROM $this->table WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['id' => $id]);
-        return $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+       return($stmt->fetch(\PDO::FETCH_ASSOC) ?: null);
     }
-
     public function verifyPassword(string $login, string $password): bool
     {
         $user = $this->findByLogin($login);
@@ -47,8 +58,7 @@ class User extends DataBase
 
     public function create(array $userData): bool
     {
-        $sql = "INSERT INTO $this->table (login, email, password, created_at) 
-                VALUES (:login, :email, :password, :created_at)";
+        $sql = "INSERT INTO $this->table (login, email, password, created_at) VALUES (:login, :email, :password, :created_at)";
 
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([

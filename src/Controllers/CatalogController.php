@@ -2,10 +2,18 @@
 
 namespace App\Controllers;
 
-class CatalogController
+use App\Core\Controller\Controller;
+
+class CatalogController extends Controller
 {
- public function index()
- {
-     require_once APP_PATH.'/views/pages/catalog.php';
- }
+    public function index(): void
+    {
+        $this->view->page('/catalog');
+    }
+
+    public function getCatalog(): void
+    {
+        $this->request->post["num_page"];
+    }
+
 }

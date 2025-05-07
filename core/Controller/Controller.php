@@ -1,11 +1,13 @@
 <?php
 
 namespace App\Core\Controller;
+use App\Core\Cookies\Cookies;
 use App\Core\DataBase\DataBase;
 use App\Core\Http\Request;
 use App\Core\Redirect\Redirect;
 use App\Core\Session\Session;
 use App\Core\View\View;
+
 use JetBrains\PhpStorm\NoReturn;
 
 
@@ -13,6 +15,7 @@ abstract  class Controller
 {
     public View $view;
 
+    public Cookies $cookie;
     public Request $request;
 
     public Session $session;
@@ -78,6 +81,16 @@ abstract  class Controller
     public function setSession(Session $session): void
     {
         $this->session = $session;
+    }
+
+    public function getCookie(): Cookies
+    {
+        return $this->cookie;
+    }
+
+    public function setCookie(Cookies $cookie): void
+    {
+        $this->cookie = $cookie;
     }
 
 }

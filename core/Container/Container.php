@@ -3,6 +3,7 @@
 namespace App\Core\Container;
 
 use App\Core\Config\Config;
+use App\Core\Cookies\Cookies;
 use App\Core\DataBase\DataBase;
 use App\Core\Http\Request;
 use App\Core\Redirect\Redirect;
@@ -25,6 +26,8 @@ class Container
     public Database $db;
 
     public Session $session;
+    public Cookies $cookies;
+
     public function __construct()
     {
         $this->registerContainer();
@@ -38,8 +41,9 @@ class Container
         $this->redirect = new Redirect();
         $this->config = new Config();
         $this->session = new Session();
+        $this->cookies = new Cookies();
         $this->request->setValidator($this->validator);
-        $this->view = new View($this->session);
+        $this->view = new View($this->session, $this->cookies);
 
 
 
@@ -49,6 +53,7 @@ class Container
             request:$this->request,
             redirect: $this->redirect,
             session: $this->session,
+            cookies: $this->cookies,
             db: $this->db,
         );
 

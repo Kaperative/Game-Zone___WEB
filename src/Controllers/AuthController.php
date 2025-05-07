@@ -5,7 +5,7 @@ namespace App\Controllers;
 use App\Core\Controller\Controller;
 use App\Core\DataBase\Model\User;
 use JetBrains\PhpStorm\NoReturn;
-
+use App\Core\JsonWebToken\JsonWebToken;
 class AuthController extends Controller
 {
     public function index(): void
@@ -23,6 +23,12 @@ class AuthController extends Controller
         }
 
 
+        $jwt=new JsonWebToken();
+       // dd($user->findByLogin($data['login'])['id']);
+        $token =$jwt->generateToken(['userID'=>$user->findByLogin($data['login'])['id']]);
+
+        $this->cookie->set('ID', $token,30*24*60*60);
+       // dd($_COOKIE);
         $this->redirect('/home');
     }
 }

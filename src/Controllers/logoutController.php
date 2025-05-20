@@ -12,7 +12,7 @@ class logoutController extends Controller
 
         $this->cookie->delete('ID');
 
-        $this->redirect('/auth');
+        $this->redirect('/home');
     }
 
 }

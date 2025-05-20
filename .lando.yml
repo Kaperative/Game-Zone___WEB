@@ -3,23 +3,40 @@ recipe: lamp
 config:
   php: 8.2
   webroot: public
+  via: nginx
 
 services:
   appserver:
-    # Автоматическая установка зависимостей
-    composer:
-      install: true
-      post_rebuild:
-        - composer install
-
+    network_mode: host
     overrides:
       environment:
         COMPOSER_MEMORY_LIMIT: -1
+        SERVER_NAME: game-zone.lndo.site
+        APP_ENV: production
+        APP_DEBUG: "false"
+        MAIL_MAILER: smtp
+        MAIL_HOST: smtp.gmail.com
+        MAIL_PORT: 587
+        MAIL_USERNAME: kaperative@gmail.com
+        MAIL_PASSWORD: zryp aajg digu zyhs
+        MAIL_ENCRYPTION: tls
+        MAIL_FROM_ADDRESS: kaperative@gmail.com
+        MAIL_FROM_NAME: "Game Zone"
       volumes:
         - ~/.composer/cache:/root/.composer/cache
 
+  database:
+    volumes:
+      - database_data:/var/lib/mysql
+
   phpmyadmin:
     type: phpmyadmin
+    hosts:
+      - database
+
+volumes:
+  database_data:
+    driver: local
 
 tooling:
   composer:

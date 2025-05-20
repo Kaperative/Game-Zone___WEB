@@ -4,8 +4,8 @@
  * @var AuthService $auth
  */
 
-use App\Core\Services\AuthService;
 use App\Core\View\View;
+use App\services\AuthService;
 
 ?>
 
@@ -20,10 +20,10 @@ use App\Core\View\View;
         </div>
         <nav class="main-nav">
             <ul>
-                <li><a href="store.html">Магазин</a></li>
+                <li><a href="/shop  ">Магазин</a></li>
                 <li><a href="library.html">Библиотека</a></li>
                 <li><a href="community.html">Сообщество</a></li>
-                <li><a href="support.html">Поддержка</a></li>
+                <li><a href="help/help">Поддержка</a></li>
             </ul>
         </nav>
         <?php
@@ -34,9 +34,7 @@ use App\Core\View\View;
 
         <?php }
         else {?>
-            <div class="header-actions">
-                <a href="/files/index"><button class="btn btn-small btn-login">FileManager</button></a>
-            </div>
+
             <a href="/logout"><button class="btn btn-small btn-login">Выйти</button></a>
         <?php } ?>
     </div>

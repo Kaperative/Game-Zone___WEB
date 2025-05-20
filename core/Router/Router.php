@@ -4,14 +4,13 @@ namespace App\Core\Router;
 
 use App\Core\Cookies\Cookies;
 use App\Core\DataBase\DataBase;
-use App\Core\DataBase\Model\User;
 use App\Core\Http\Request;
 use App\Core\JsonWebToken\JsonWebToken;
 use App\Core\MiddleWare\AbstractMiddleWare;
-use App\Core\MiddleWare\Middleware;
 use App\Core\Redirect\Redirect;
-use App\Core\View\View;
 use App\Core\Session\Session;
+use App\Core\View\View;
+use App\Models\User;
 
 class Router
 {

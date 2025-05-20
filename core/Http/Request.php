@@ -6,7 +6,8 @@ use App\Core\Validator\Validator;
 
 class Request
 {
-    private array $get;
+        public array $get;
+
         public array $post;
         public array $server;
         public array $files;
@@ -46,6 +47,11 @@ class Request
    public function inputGET($name, $default = null)
    {
        return $this->get[$name] ?? $default;
+   }
+
+   public function setGET($name, $value): void
+   {
+        $this->get[$name] = $value;
    }
 
    public function inputPOST($name, $default = null)

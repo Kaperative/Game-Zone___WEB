@@ -1,41 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Файловый менеджер</title>
-    <style>
-        .file-manager {
-            max-width: 800px;
-            margin: 0 auto;
-            font-family: Arial, sans-serif;
-        }
-        .file-list {
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            padding: 10px;
-        }
-        .file-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-        }
-        .file-item:last-child {
-            border-bottom: none;
-        }
-        .message {
-            padding: 10px;
-            margin: 10px 0;
-            background: #f0f0f0;
-        }
-        .upload-form {
-            margin: 20px 0;
-            padding: 20px;
-            background: #f9f9f9;
-            border: 1px dashed #ccc;
-        }
-    </style>
-</head>
-<body>
+<?php
+/**
+ * @var View $view
+ */
+
+use App\Core\View\View;
+?>
+
+<?php $view->includeComponent('header'); ?>
 <div class="file-manager">
     <h1>Файловый менеджер</h1>
 

@@ -4,34 +4,58 @@ namespace App\Core\View;
 
 use App\Core\Cookies\Cookies;
 use App\Core\Session\Session;
-use App\Core\Services\AuthService;
+use App\Models\User;
+use App\services\AuthService;
+use App\Core\Config\Config;
 class View
 {
     private Session $session;
     private  Cookies $cookies;
     private AuthService $auth;
+    private User $user;
+
+    private Config $config;
+
+    private array $defaultVariables ;
     public function __construct(Session $session, Cookies $cookies)
     {
+        $this->config= new Config();
         $this->session = $session;
+        $this->user = new User();
         $this -> cookies = $cookies;
         $this->auth = new AuthService();
+
+        $this->defaultVariables=$this->getDefaultVariables();
     }
     public function page(string $page):void
     {
-        extract($this->getDefaultVariables()); // all variables in method of class (clear this methode)
+        extract($this->defaultVariables);
         require_once APP_PATH."/views/pages/$page.php";
     }
 
     public function includeComponent(string $component):void
     {
-        extract($this->getDefaultVariables()); // all variables in method of class (clear this methode)
+
+        extract($this->defaultVariables);
         require_once APP_PATH."/views/components/$component.php";
     }
 
-    public function render(string $view, $variables):void
+    public function includeAdminComponent(string $component): void
     {
-        extract($variables);
-        require_once APP_PATH."/views/pages/files/index.php";
+        if ($this->auth->isLogin())
+        {
+            extract($this->defaultVariables);
+            require_once APP_PATH."/views/admin/$component.php";
+        }
+
+    }
+
+    public function render(string $page, $variables):void
+    {
+
+       $this->defaultVariables=array_merge($this->defaultVariables,$variables);
+        extract($this->defaultVariables);
+        require APP_PATH."/views/pages/{$page}.php";
     }
     private function getDefaultVariables():array
     {
@@ -40,6 +64,8 @@ class View
             'session'=>$this->session,
             'cookies'=>$this->cookies,
             'auth'=>$this->auth,
+            'user'=>$this->user,
+            'configUI'=>$this->config->getAll('configUI'),
         ];
     }
 }

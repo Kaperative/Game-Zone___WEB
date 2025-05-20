@@ -17,4 +17,10 @@ class Config
         $config= require $path;
         return $config[$variable]??null;
     }
+
+    public function getAll(string $name): array
+    {
+       return  include APP_PATH.'/config/'.$name.'.php';
+
+    }
 }

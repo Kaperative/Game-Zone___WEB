@@ -26,6 +26,7 @@ class filesController extends Controller
 
         $this->view->render('files/index', [
             'files' => $files,
+            'view' => $this->view,
             'message' => $_SESSION['message'] ?? null
         ]);
 

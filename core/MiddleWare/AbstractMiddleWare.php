@@ -3,11 +3,12 @@
 namespace App\Core\MiddleWare;
 
 use App\Core\Cookies\Cookies;
-use App\Core\DataBase\Model\User;
 use App\Core\Http\Request;
 use App\Core\JsonWebToken\JsonWebToken;
 use App\Core\Redirect\Redirect;
 use App\Core\Session\Session;
+use App\Models\User;
+use App\services\AuthService;
 
 
 abstract class AbstractMiddleWare
@@ -17,6 +18,8 @@ abstract class AbstractMiddleWare
     protected Cookies $cookie;
     protected Session $session;
     protected JsonWebToken $jwt;
+
+    protected AuthService $auth;
 
     protected User $user;
     public function __construct(
@@ -34,6 +37,7 @@ abstract class AbstractMiddleWare
         $this->session = $session;
         $this->jwt = $jwt;
         $this->user = $user;
+        $this->auth = new AuthService();
     }
 
     abstract function handle(): void;

@@ -43,14 +43,14 @@ class JsonWebToken
     /**
      * Validate JWT Token
      * @param string $token
-     * @return stdClass Token Data
+     * @return stdClass|false Token Data
      */
-    public function validateToken(string $token): stdClass
+    public function validateToken(string $token): stdClass|false
     {
         try {
             return \Firebase\JWT\JWT::decode($token, new \Firebase\JWT\Key($this->secretKey, 'HS256'))?->data;
         } catch (\Exception $ex) {
-            return new stdClass();
+            return false;
         }
     }
 }

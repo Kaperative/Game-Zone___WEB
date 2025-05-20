@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Controller\Controller;
-use App\Core\DataBase\Model\User;
+use App\Models\User;
 use JetBrains\PhpStorm\NoReturn;
 
 
@@ -35,12 +35,13 @@ class RegisterController extends Controller
             $this->redirect($this->request->getUri()); // redirect in this page
         }
 
+       // dd($data);
         $data = [
             'login' => $data['username'],
             'email' => $data['email'],
-            'password' => password_hash($data['password'], PASSWORD_DEFAULT),
+            'password' => $data['password'],
         ];
-
+       // dd($data);
         $user = new User();
         if ($user->findByLogin($data['login']))
         {

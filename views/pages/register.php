@@ -1,4 +1,3 @@
-
 <?php
 /**
  * @var App\Core\View\View $view
@@ -6,10 +5,11 @@
  */
 
 use App\Core\Session\Session;
-
 ?>
 
+<?php  $view->includeComponent('topLine');   ?>
 <?php  $view->includeComponent("header"); ?>
+
 <main class="register-page">
     <div class="register-container">
         <div class="register-box">

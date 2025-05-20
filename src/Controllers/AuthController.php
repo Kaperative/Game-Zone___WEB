@@ -3,9 +3,10 @@
 namespace App\Controllers;
 
 use App\Core\Controller\Controller;
-use App\Core\DataBase\Model\User;
-use JetBrains\PhpStorm\NoReturn;
 use App\Core\JsonWebToken\JsonWebToken;
+use App\Models\User;
+use JetBrains\PhpStorm\NoReturn;
+
 class AuthController extends Controller
 {
     public function index(): void

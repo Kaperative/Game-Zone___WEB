@@ -14,7 +14,23 @@ class SupportRequest extends DataBase
         parent::__construct($config);
     }
 
-    private $table = 'supportRequests';
+    public function getCountAllRequest(): int
+    {
+        $sql ="SELECT COUNT(*) as total FROM $this->table";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchColumn()??0;
+    }
+
+    public function getCountUnprocessedRequest(): int
+    {
+        $sql = "SELECT COUNT(*) as total FROM $this->table WHERE processed = 0";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchColumn()??0;
+    }
+
+    private $table = 'support_request';
 
     #[NoReturn] public function addRequest( int $id_user, string $header_request , string $body_request): void
     {
@@ -37,35 +53,52 @@ class SupportRequest extends DataBase
     }
     public function getPaginationSupportRequest(int $page = 1, int $perPage = 10, string $search = ''): array
     {
+         return $this->getPaginated($this->table, $page, $perPage, $search, ['id','login']);
+    }
+
+    #[NoReturn] public function setAnswer(int $id, int $admin_id ,string $header_answer, string $body_answer): void
+    {
+        $sql = "UPDATE $this->table 
+        SET id_admin = :id_admin, 
+            header_answer = :header_answer, 
+            body_answer = :body_answer, 
+            processed = :processed 
+        WHERE id = :id";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':id_admin', $admin_id);
+        $stmt->bindParam(':header_answer', $header_answer);
+        $stmt->bindParam(':body_answer', $body_answer);
+        $i = 1; // true
+        $stmt->bindParam(':processed', $i);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+    }
+
+
+    public function getUserPaginationSupportRequest(int $page = 1, int $perPage = 10, int $user_id): array
+    {
         $offset = ($page - 1) * $perPage;
 
-        // Базовый запрос
-        $sql = "SELECT * FROM supportRequests";
-        $countSql = "SELECT COUNT(*) FROM supportRequests";
+        $sql = "SELECT * FROM support_request";
+        $countSql = "SELECT COUNT(*) FROM support_request";
         $params = [];
         $where = "";
 
-        // Добавляем поиск если нужно
         if (!empty($search)) {
-            $where = " WHERE header_request LIKE :search";
-            if (is_numeric($search)) {
-                $where .= " OR id = :id";
-                $params[':id'] = (int)$search;
-            }
-            $params[':search'] = "%$search%";
+            $where = " WHERE (user_id =:user_id)";
+
+        } else {
+            $where = ' ';
         }
 
         $sql .= $where . " ORDER BY created_at DESC LIMIT :limit OFFSET :offset";
         $countSql .= $where;
-
-        // Получаем данные
         $stmt = $this->pdo->prepare($sql);
 
-        // Привязываем параметры пагинации
         $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
 
-        // Привязываем параметры поиска
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);
         }
@@ -73,7 +106,6 @@ class SupportRequest extends DataBase
         $stmt->execute();
         $supportRequests = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        // Получаем общее количество
         $stmt = $this->pdo->prepare($countSql);
         foreach ($params as $key => $value) {
             $stmt->bindValue($key, $value);

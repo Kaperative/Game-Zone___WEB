@@ -28,53 +28,7 @@ class User extends DataBase
 
     public function getPaginatedUsers(int $page = 1, int $perPage = 10, string $search = ''): array|false
     {
-
-        $offset = ($page - 1) * $perPage;
-
-        // Базовый запрос
-        $sql = "SELECT * FROM users";
-        $countSql = "SELECT COUNT(*) FROM users";
-        $params = [];
-
-        // Добавляем поиск если нужно
-        if (!empty($search)) {
-            $where = " WHERE login LIKE :search OR id = :id";
-            $sql .= $where;
-            $countSql .= $where;
-            $params = [
-                'search' => "%$search%",
-                'id' => is_numeric($search) ? (int)$search : -1
-            ];
-        }
-
-        // Добавляем сортировку и лимиты
-        $sql .= " ORDER BY created_at DESC LIMIT :limit OFFSET :offset";
-
-        // Получаем пользователей
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
-
-        foreach ($params as $key => $value) {
-            $stmt->bindValue($key, $value);
-        }
-
-        $stmt->execute();
-        $users = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-        // Получаем общее количество
-        $stmt = $this->pdo->prepare($countSql);
-        foreach ($params as $key => $value) {
-            $stmt->bindValue($key, $value);
-        }
-        $stmt->execute();
-        $total = (int)$stmt->fetchColumn();
-
-        return [
-            'users' => $users,
-            'total' => $total,
-            'total_pages' => ceil($total / $perPage)
-        ];
+        return $result = $this->getPaginated($this->table, $page, $perPage, $search, ['id','login']);
     }
 
     public function findByLogin(string $login): ?array
@@ -114,7 +68,7 @@ class User extends DataBase
         return $user && password_verify($password, $user['password']);
     }
 
-    public function create(array $userData): bool
+    public function createUser(array $userData)
     {
         $sql = "INSERT INTO $this->table (login, email, password, created_at) VALUES (:login, :email, :password, :created_at)";
         $stmt = $this->pdo->prepare($sql);
@@ -162,6 +116,15 @@ class User extends DataBase
         $sql= "UPDATE $this->table SET isAdmin = :isAdmin WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute(['isAdmin' => 0, 'id' => $id]);
+    }
+
+    public function getCountUser(): int
+    {
+        $sql= "SELECT COUNT(*) as total FROM $this->table";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchColumn()??0;
+
     }
 
 }

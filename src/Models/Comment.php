@@ -8,7 +8,7 @@ use JetBrains\PhpStorm\NoReturn;
 
 class Comment extends DataBase
 {
-    #[NoReturn] public function  create(int $id_user, string $content): void
+    #[NoReturn] public function  createUser(int $id_user, string $content): void
     {
         $sql= "INSERT INTO comments (id_user, content,created_at,updated_at) VALUES(:id_user, :content,:created_at,:updated_at)";
         $stmt = $this->pdo->prepare($sql);

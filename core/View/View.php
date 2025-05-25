@@ -40,17 +40,12 @@ class View
         require_once APP_PATH."/views/components/$component.php";
     }
 
-    public function includeAdminComponent(string $component): void
+    public function includeScripts(string $script): void
     {
-        if ($this->auth->isLogin())
-        {
-            extract($this->defaultVariables);
-            require_once APP_PATH."/views/admin/$component.php";
-        }
-
+        require_once APP_PATH."/views/scripts/$script.php";
     }
 
-    public function render(string $page, $variables):void
+    public function render(string $page, array $variables=[]):void
     {
 
        $this->defaultVariables=array_merge($this->defaultVariables,$variables);
@@ -66,6 +61,8 @@ class View
             'auth'=>$this->auth,
             'user'=>$this->user,
             'configUI'=>$this->config->getAll('configUI'),
+            'isAdmin'=>$this->auth->isAdmin(),
+            'isAuthorize'=> $this->auth->isLogin()
         ];
     }
 }

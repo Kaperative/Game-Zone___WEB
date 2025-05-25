@@ -1,11 +1,21 @@
 <?php
 
+use App\Core\View\View;
 use App\Models\User;
 use App\services\AuthService;
 
 /**
+ * @var View $view
  * @var AuthService $auth
  * @var array $articles
+ * @var array $columns
+ * @var array $rows
+ * @var string $tableName
+ * @var bool $isAdmin
+ * @var array $primary
+
+ *
+ // pagination
  * @var int $currentPage
  * @var int $totalPages
  * @var int $perPage
@@ -106,6 +116,7 @@ use App\services\AuthService;
     .table-cell:nth-child(8) { flex: 3; min-width: 100px; }
     .table-cell:nth-child(9) { flex: 3; min-width: 100px; }
     .table-cell:nth-child(10) { flex: 3; min-width: 100px; }
+
 
     .status-badge {
         padding: 6px 10px;
@@ -233,87 +244,102 @@ use App\services\AuthService;
 </style>
 
 
+
+
 <div class="users-management-container">
     <div class="users-header">
-        <h1 class="users-title">Управление пользователями</h1>
+        <h1 class="users-title"><?=$tableName?></h1>
         <div class="users-search">
             <form method="get" class="search-form">
-                <input type="text" name="search" placeholder="Поиск по логину или ID"
+                <input type="text" name="search" placeholder="Поиск "
                        value="<?= htmlspecialchars($searchQuery ?? '') ?>">
                 <button type="submit" class="btn-search">Найти</button>
             </form>
         </div>
+        <?php if ($tableName !== 'admin_logs' && $tableName !== 'users'): ?>
+        <button type="button" class="btn btn-primary open-form-btn"
+                data-mode="add"
+                data-table="<?=$tableName?>"
+                data-primary='<?= json_encode($primary) ?>'
+                data-fields='<?= json_encode($columns) ?>'>
+            Добавить
+        </button>
+        <?php endif; ?>
     </div>
 
 
-    <div style="margin-bottom: 20px;">
-        <button id="add-article-btn" class="btn-action grant">Добавить статью</button>
-    </div>
-
-    <div id="article-form-container" style="display: none; margin-bottom: 30px;">
-        <form id="article-form" method="post" action="/admin/save-article">
-            <input type="hidden" name="id" id="article-id">
-            <div style="margin-bottom: 10px;">
-                <input type="text" name="header" id="article-header" placeholder="Заголовок" style="width: 100%; padding: 10px;">
-            </div>
-            <div style="margin-bottom: 10px;">
-                <textarea name="content" id="article-content" placeholder="Содержимое" style="width: 100%; padding: 10px; height: 100px;"></textarea>
-            </div>
-            <div style="margin-bottom: 10px;">
-                <input type="text" name="tag" id="article-tag" placeholder="Тег" style="width: 100%; padding: 10px;">
-            </div>
-            <div>
-                <button type="submit" class="btn-action grant">Сохранить</button>
-                <button type="button" id="cancel-article-btn" class="btn-action delete">Отмена</button>
-            </div>
-        </form>
-    </div>
-
-
-    <div class="users-table-wrapper">
         <div class="users-table">
-            <div class="table-header">
-                <div class="table-row">
-                    <div class="table-cell">ID</div>
-                    <div class="table-cell">ID_USER</div>
-                    <div class="table-cell">Заголовок</div>
-                    <div class="table-cell">Содержимое</div>
-                    <div class="table-cell">Лайки</div>
-                    <div class="table-cell">Дизлайки</div>
-                    <div class="table-cell">created_at</div>
-                    <div class="table-cell">updated_at</div>
-                    <div class="table-cell">tag</div>
-                    <div class="table-cell">Действия</div>
-                </div>
-            </div>
-
-            <div class="table-body">
-                <?php foreach ($articles as $article): ?>
-                    <div class="table-row">
-                        <div class="table-cell"><?= $article['id'] ?></div>
-                        <div class="table-cell"><?= $article['id_user'] ?></div>
-                        <div class="table-cell"><?= htmlspecialchars($article['header']) ?></div>
-                        <div class="table-cell ellipsis"><?= htmlspecialchars($article['content']) ?></div>
-                        <div class="table-cell"><?= htmlspecialchars($article['likes']) ?></div>
-                        <div class="table-cell"><?= htmlspecialchars($article['dislikes']) ?></div>
-                        <div class="table-cell"><?= date('Y-m-d', $article['created_at']) ?></div>
-                        <div class="table-cell"><?= date('Y-m-d', $article['updated_at']) ?></div>
-                        <div class="table-cell"><?= htmlspecialchars($article['tag']) ?></div>
-                        <div class="table-cell actions-cell">
-                            <?php if ($article['id']): ?>
-                                <form method="post" action="/admin/delete-article?article_id=<?= $article['id'] ?>"
-                                      onsubmit="return confirm('Вы уверены, что хотите удалить этого пользователя?')">
-                                    <button type="submit" class="btn-action delete">Удалить</button>
-                                </form>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+        <div class="table-header">
+            <div class="table-row">
+                <?php foreach ($columns as $col): ?>
+                    <div class="table-cell"><?= htmlspecialchars($col) ?></div>
                 <?php endforeach; ?>
+                <?php if ($isAdmin) {?>
+                <div class="table-cell">Действия</div>
+                <?php } ?>
             </div>
+        </div>
+
+
+        <div class="table-body">
+            <?php foreach ($rows as $row): ?>
+                <div class="table-row">
+                    <?php foreach ($columns as $col): ?>
+                        <div class="table-cell ellipsis"><?= htmlspecialchars($row[$col] ?? '') ?></div>
+                    <?php endforeach; ?>
+
+                    <?php if ($isAdmin) {?>
+
+                <div class="table-cell actions-cell">
+                        <?php if (isset($row['id'])): ?>
+
+                            <?php if ($tableName !== 'admin_logs'){ ?>
+                            <form class="action-form" method="post" action="/admin/delete?id=<?= $row['id']?>&table=<?=$tableName?>"
+                                  onsubmit="return confirm('Вы уверены, что хотите удалить это обращение?')">
+                                <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                <button type="submit" class="btn btn-danger">Удалить</button>
+                            </form>
+
+                            <button type="button" class="btn btn-primary open-form-btn"
+                                    data-id="<?= $row['id'] ?>"
+                                    data-mode="edit"
+                                    data-table="<?=$tableName?>"
+                                    data-primary='<?= json_encode($primary) ?>'
+                                    data-values ='<?= json_encode($row)?>'
+                                    data-fields='<?= json_encode($columns) ?>'>
+                                Редактировать
+                            </button>
+                            <?php }?>
+                        <?php if ($tableName === 'users'): ?>
+                            <form method="post" action="/admin/<?= $row['isAdmin'] ? 'unsetAdmin' : 'setAdmin' ?>?user_id=<?=$row['id']?>" class="action-form">
+                                <button type="submit" class="btn-action <?= $row['isAdmin'] ? 'revoke' : 'grant' ?>">
+                                    <?= $row['isAdmin'] ? 'Снять админа' : 'Назначить админом' ?>
+                                </button>
+                            </form>
+
+                            <?php elseif ($tableName === 'support_request'): ?>
+                                <?php if (!$row['processed']):?>
+                                <button type="button" class="btn btn-primary reply-btn-request"
+                                        data-id="<?= htmlspecialchars($row['id'], ENT_QUOTES) ?>"
+                                        data-header="<?= htmlspecialchars($row['header_request'], ENT_QUOTES) ?>"
+                                        data-content="<?= htmlspecialchars($row['body_request'] ?? '', ENT_QUOTES) ?>">
+                                    Ответить
+                                </button>
+                                <?php endif; ?>
+
+
+                            <?php endif; ?>
+
+                        <?php endif; ?>
+                    </div>
+                    <?php } ?>
+
+                </div>
+            <?php endforeach; ?>
         </div>
     </div>
 
-    <div class="users-pagination">
+    <div class="pagination">
         <?php if ($currentPage > 1): ?>
             <a href="?page=1&per_page=<?= $perPage ?>&search=<?= urlencode($searchQuery) ?>" class="page-link">Первая</a>
             <a href="?page=<?= $currentPage - 1 ?>&per_page=<?= $perPage ?>&search=<?= urlencode($searchQuery) ?>" class="page-link">Назад</a>
@@ -328,48 +354,16 @@ use App\services\AuthService;
             <a href="?page=<?= $totalPages ?>&per_page=<?= $perPage ?>&search=<?= urlencode($searchQuery) ?>" class="page-link">Последняя</a>
         <?php endif; ?>
     </div>
+
+    <?php $view->includeComponent('/Pagination/defaultPagination');?>
 </div>
-<script>
-    const addBtn = document.getElementById('add-article-btn');
-    const cancelBtn = document.getElementById('cancel-article-btn');
-    const formContainer = document.getElementById('article-form-container');
-    const form = document.getElementById('article-form');
-    const idField = document.getElementById('article-id');
-    const headerField = document.getElementById('article-header');
-    const contentField = document.getElementById('article-content');
-    const tagField = document.getElementById('article-tag');
 
-    // Очистка формы
-    function clearForm() {
-        idField.value = '';
-        headerField.value = '';
-        contentField.value = '';
-        tagField.value = '';
-    }
 
-    // Показ формы для добавления
-    addBtn.addEventListener('click', () => {
-        clearForm();
-        formContainer.style.display = 'block';
-        form.scrollIntoView({ behavior: 'smooth' });
-    });
+<?php
+    $view->includeScripts('/Universal/add');
+if ($tableName === 'support_request')
 
-    // Отмена
-    cancelBtn.addEventListener('click', () => {
-        formContainer.style.display = 'none';
-        clearForm();
-    });
+{
+    $view->includeScripts('/support/answer');
+}?>
 
-    // Редактирование статьи
-    document.querySelectorAll('.edit-article-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            idField.value = btn.dataset.id;
-            headerField.value = btn.dataset.header;
-            contentField.value = btn.dataset.content;
-            tagField.value = btn.dataset.tag;
-
-            formContainer.style.display = 'block';
-            form.scrollIntoView({ behavior: 'smooth' });
-        });
-    });
-</script>

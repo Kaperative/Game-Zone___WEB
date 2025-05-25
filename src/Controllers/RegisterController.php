@@ -53,7 +53,7 @@ class RegisterController extends Controller
             $this->session->set('email','this  email is busy');
             $this->redirect($this->request->getUri()); // redirect in this page
         }
-        if(!$user->create($data))
+        if(!$user->createUser($data))
             exit("FALSE PDO");
         $this->redirect('/auth');
     }

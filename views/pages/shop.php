@@ -3,6 +3,7 @@
  * @var App\Core\View\View $view
  * @var Session $session
  * @var User $user;
+
  */
 
 use App\Core\Session\Session;

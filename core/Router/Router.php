@@ -63,6 +63,7 @@ class Router
         if(!empty($middlewares))
         {
            $middleware = $middlewares[0];
+
                 /**
                  * @var AbstractMiddleWare $middleware
                  */
@@ -79,8 +80,7 @@ class Router
 
 
         if(is_array($route->getAction())) {
-            $temp= $route->getAction();
-            [$controller, $action] = $temp;
+            [$controller, $action] = $route->getAction();
 
             $controller = new $controller();
             call_user_func_array([$controller, 'setView'], [$this->view]);

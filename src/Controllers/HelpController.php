@@ -15,14 +15,37 @@ class HelpController extends Controller
 
     public function index():void
     {
-        $this->view->page('/Help/help');
+        $this->view->page('/help/help');
     }
 
+    public function indexMain()
+    {
+        $page = (int)($this->request->inputGET('page') ?? 1);
+        $perPage = (int)($this->request->inputGET('per_page') ?? 10);
+        $search = $this->request->inputGET('search') ?? '';
+        $user_id= (new AuthService())->getId();
+        $supportModel = new SupportRequest();
+        $result =$supportModel->getUserPaginationSupportRequest($page, $perPage, $user_id);
+
+
+        $this->view->render('/help/main', [
+            'supportRequests' => $result['supportRequests'],
+            'currentPage' => $page,
+            'totalPages' => $result['total_pages'],
+            'perPage' => $perPage,
+            'searchQuery' => $search
+        ]);
+    }
     public function saveSupportRequest():void
     {
         $support= new SupportRequest();
         $auth = new AuthService();
-        $support->addRequest($auth->getId(),$this->request->inputPOST('subject'),$this->request->inputPOST('message'));
+        $support->addRequest(
+                    $auth->getId(),
+                    $this->request->inputPOST('subject'),
+                    $this->request->inputPOST('message')
+        );
+        
         $this->sendMail();
         $this->redirect('/help/help');
     }

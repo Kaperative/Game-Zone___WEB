@@ -13,7 +13,7 @@ use App\Models\User;
 <?php $view->includeComponent("topLine"); ?>
 
     <main class="admin-users">
-        <?php  $view->includeComponent('/table/supportTable');?>
+        <?php  $view->includeComponent('AdminTable//UniversalTable');?>
     </main>
 
 <?php $view->includeComponent("footer"); ?>
